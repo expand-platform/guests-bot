@@ -1,6 +1,6 @@
-DATABASE_NAME = "platform-bot"
+DATABASE_NAME = "guests-bot"
 DATABASE_CONNECTIONS_LIMIT=1
 
 USER_COLLECTION = "users"
 
-REPLICA_NAME="platform-bot-replica"
+REPLICA_NAME="guests-bot-replica"

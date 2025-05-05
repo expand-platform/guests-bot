@@ -22,8 +22,8 @@ class Database:
 
     Cache is used for fast data lookup (no need to send reduntant database requests)
 
-    # Cache and MongoDB are private classes
-    # Don't use them. Instead, user predefined methods like add_user or remove_user
+    Cache and MongoDB are private classes
+    Don't use them. Instead, user predefined methods like add_user or remove_user
 
     """
 
@@ -32,7 +32,7 @@ class Database:
     DATABASE_NAME: str
     SUPER_ADMIN_ID: int
     ADMIN_IDS: list[int] | int
-    # USER_IDS: list[int] | int
+    USER_IDS: Optional[list[int] | int] = None
 
     adapter: DatabaseAdapter = DatabaseAdapter.MONGODB
     _database: MongoDB = field(init=False)

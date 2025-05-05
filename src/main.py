@@ -6,11 +6,9 @@ from config.langConfig import DEFAULT_LANGUAGE
 
 # ? bot engine
 from libs.bot_engine.bot.Bot import Bot
-from libs.bot_engine.database.MongoDB import MongoDB
 from libs.bot_engine.dialogs.DialogGenerator import DialogGenerator
 from libs.bot_engine.languages.Languages import Languages
 from libs.bot_engine.database.Database import Database
-from libs.bot_engine.database.Cache import Cache
 
 # ? engine customization
 from bot.BotPlugins import MyBotPlugins
@@ -33,7 +31,6 @@ languages = Languages(DEFAULT_LANGUAGE)
 db = Database(DATABASE_TOKEN, DATABASE_NAME, SUPER_ADMIN_ID, ADMIN_IDS)
 bot = Bot(db, languages)
 dialogGenerator = DialogGenerator(bot, languages, db)
-# BotDialogs = BotDialogs()
 
 # Bot plugins and settings are created here
 bot_configs = MyBotPlugins(
