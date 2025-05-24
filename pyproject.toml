@@ -5,7 +5,6 @@ description = ""
 authors = ["Ca-tt <damir96.lukyanenko@gmail.com>"]
 readme = "README.md"
 packages = []  
-python = ">=3.13"
 
 [tool.poetry.dependencies]
 python = ">=3.13"
