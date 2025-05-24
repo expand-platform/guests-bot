@@ -14,7 +14,7 @@ from telebot.states.sync.context import StateContext
 
 
 # ? bot engine
-from config.env import SUPER_ADMIN_ID
+from config.env import SUPER_ADMIN_ID, ADMIN_IDS
 from libs.bot_engine.bot.Bot import Bot
 from libs.bot_engine.users.User import User
 from libs.bot_engine.database.MongoDB import MongoDB
@@ -37,15 +37,42 @@ class DialogGenerator:
     languages: Languages
     database: Database
 
+    def set_handler_type(self, 
+        state: StateContext | None = None, 
+        inline_keyboard: str | None = None, 
+        reply_keyboard: str | None = None, 
+    ) -> HandlerType:
+        """ defines one of 4 handler_type: slash_command, state, inline or reply keyboard """
+        handler_type = HandlerType.SLASH_COMMAND
+        
+        if state:
+            return HandlerType.STATE
+
+        elif inline_keyboard:
+            return HandlerType.INLINE_KEYBOARD
+        
+        elif reply_keyboard:
+            return HandlerType.REPLY_KEYBOARD
+        
+        return handler_type
+
+
+    def generate_inline_button_callback_prefix(self, handler_type: HandlerType, how_much: int = 12) -> str | None:
+        if handler_type == HandlerType.INLINE_KEYBOARD:
+            """ create a random string for inline buttons callback prefix """
+            return ''.join(choices(ascii_lowercase, k=how_much))
+        return None
    
+
     # ? ADMIN COMMANDS
     def make_dialog(
         self,
-        access_level: Optional[list[AccessLevel]] = [AccessLevel.USER, AccessLevel.ADMIN, AccessLevel.SUPER_ADMIN],
+        access_level: Optional[list[AccessLevel]] = [AccessLevel.USER, AccessLevel.ADMIN, AccessLevel.SUPER_ADMIN], 
+        
         # ? how message is going to be handled (/test, inlineKeyboard button, state step)
-        handler_type: Optional[HandlerType] = HandlerType.SLASH_COMMAND,  # command, state, keyboard
-        handler_prefix: str = None,  # uu:, su: #! auto generated
-        # ?
+        handler_prefix: str = None,  # uu:, su: #! inline_keyboard_prefix must be auto generated
+        
+        #?
         handler_property: str = None,  # user_id, user_property
         buttons_callback_prefix: str = None,  # user_id, user_property
         command_name: str = None,
@@ -65,19 +92,27 @@ class DialogGenerator:
         formatted_messages: list = None,
         formatted_variables: list = None,
 
-        # ? create a keyboard
-        keyboard_with_before_message: str = None,
-        keyboard_with_after_message: str = None,
+        #? keyboard
+        keyboard_with_first_message: str = None,
+        keyboard_with_last_message: str = None,
+        reply_keyboard: str = None,
 
         # ? mongodb
         database_activation_position: str = "after_messages",
         database_method_name: str = None,
     ):
+        #! --- 1. Globals 
+        handler_type = self.set_handler_type(
+            state=next_state or active_state, 
+            inline_keyboard=keyboard_with_first_message or keyboard_with_last_message, reply_keyboard=reply_keyboard)
+        
+        inline_keyboard_prefix = self.generate_inline_button_callback_prefix(handler_type)
 
-        def set_custom_command(
+
+        def handler(
             message: Union[Message, CallbackQuery], state: StateContext
         ):
-            
+                
             # ? initial data for keyboard reply
             call_data = None
             call_id = None
@@ -144,14 +179,14 @@ class DialogGenerator:
                 )
 
             # ? set keyboard, if needed
-            if keyboard_with_before_message or keyboard_with_after_message:
+            if keyboard_with_first_message or keyboard_with_last_message:
                 print(
-                    f"create keyboard with text: {keyboard_with_before_message or keyboard_with_after_message}"
+                    f"create keyboard with text: {keyboard_with_first_message or keyboard_with_last_message}"
                 )
 
                 keyboard = self.create_inline_keyboard(
-                    keyboard_type=keyboard_with_before_message
-                    or keyboard_with_after_message,
+                    keyboard_type=keyboard_with_first_message
+                    or keyboard_with_last_message,
                     callback_user_id=call_data,
                     # prefixes
                     handler_prefix=handler_prefix,
@@ -215,46 +250,114 @@ class DialogGenerator:
             if not next_state:
                 state.delete()
 
-            self.notify_super_admin(
+            #! make a notification system where admins and superadmins exist
+            self.notify_admins(
                 active_user=active_user,
                 command_name=command_name,
                 handler_type=handler_type
             )
             
 
-        # choose type of message handler
+        #! register proper type of handler listener
+
+        self.set_handler_listener(
+            handler_type=handler_type,
+            handler_function=handler,
+
+            slash_command=command_name,
+            active_state=active_state,
+            inline_button_prefix=None,
+
+            access_level=access_level,
+        )
+
+
+    def set_handler_listener(self, 
+        handler_function: Callable,
+
+        #? extras for different types of handler
+        slash_command: Optional[str | list[str]] = None, 
+        active_state: Optional[StateContext] = None, 
+        inline_button_prefix: Optional[str] = None,
+
+        handler_type: Optional[HandlerType] = HandlerType.SLASH_COMMAND, 
+        access_level: Optional[list[AccessLevel]] = [AccessLevel.USER, AccessLevel.ADMIN, AccessLevel.SUPER_ADMIN] 
+    ) -> None:
+        """ sets listener for all types of HandlerType """
         if handler_type == HandlerType.SLASH_COMMAND:
             self.bot._bot.register_message_handler(
-                callback=set_custom_command,
-                commands=[command_name],
+                callback=handler_function,
                 access_level=access_level,
+                commands=[slash_command],
             )
 
-        if handler_type == HandlerType.STATE:
+        elif handler_type == HandlerType.STATE:
             self.bot._bot.register_message_handler(
-                callback=set_custom_command,
-                state=active_state,
+                callback=handler_function,
                 access_level=access_level,
+                state=active_state,
             )
 
-        if handler_type == HandlerType.INLINE_KEYBOARD:
+
+        elif handler_type == HandlerType.INLINE_KEYBOARD:
             self.bot._bot.register_callback_query_handler(
-                callback=set_custom_command,
+                callback=handler_function,
                 access_level=access_level,
                 func=lambda call: call.data.startswith(
-                    f"{handler_prefix}:{handler_property}"
+                    f"{inline_button_prefix}"
                 ),
             )
 
+
+        elif handler_type == HandlerType.REPLY_KEYBOARD:
+            pass
+            
+
+
+    def notify_admins(self, 
+        #? whom to tell this message
+        tell_super_admin: Optional[bool] = True, 
+        tell_admins: Optional[bool] = False,
+
+        #? data for message generation
+        active_user: User | None = None, 
+        handler_type = HandlerType.SLASH_COMMAND, 
+        command_name: str | None = None,
+        
+        custom_messages: Optional[list[str] | str] = None,
+    ) -> None:
+        """ tells admins and super_admin something important """
+
+        #? create message based on handler_type        
+        message_text = f"{active_user.first_name} зашёл в /{command_name}"
+
+        if handler_type == HandlerType.INLINE_KEYBOARD:
+            message_text = f"{active_user.first_name} нажал на кнопку /{command_name}"
+
+        if custom_messages:
+            message_text = custom_messages
+
+        if tell_admins and len(ADMIN_IDS) > 0:
+            self.bot.tell_admins(messages=message_text)
+
+        if tell_super_admin:
+            self.notify_super_admin(
+                active_user=active_user,
+                command_name=command_name,
+                handler_type=handler_type,
+                messages=message_text
+            )
+        
+
+
     # * HELPERS
     #! Добавить параметры для работы с ADMINS и SUPER_ADMIN
-    def notify_super_admin(self, active_user: dict, command_name: str, handler_type: HandlerType):
+    def notify_super_admin(self, active_user: dict, command_name: str, handler_type: HandlerType, messages: list[str] | str = None):
         #! Нужно добавить проверку на _ в любой строке, т.к. это ломает функционал...
         if handler_type == HandlerType.SLASH_COMMAND:
             if active_user.user_id != SUPER_ADMIN_ID:
-                # print(active_user.first_name)
-                # print(active_user.username)
-                self.bot.tell_super_admin(messages=f"{active_user.first_name}  зашёл в /{command_name}")
+                self.bot.tell_super_admin(messages=messages)
+
 
     def set_slash_commands(self, active_user):
         if active_user["access_level"] == "guest":

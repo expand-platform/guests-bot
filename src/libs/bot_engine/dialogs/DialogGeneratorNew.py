@@ -284,6 +284,7 @@ class DialogGenerator:
         """Returns True if inline_keyboard is selected with a message"""
         return True if inline_keyboard else False
 
+
     def set_inline_keyboard_data(self, message: Message | CallbackQuery, inline_keyboard_callback_data):
         """Prepares data needed for inline keyboard handling"""
 
@@ -519,13 +520,7 @@ class DialogGenerator:
 
         if respond_to == HandlerType.REPLY_KEYBOARD:
             pass
-            # ? from docs
-            # ? @bot.message_handler(func=lambda msg: msg.text in ["Yes", "No"])
-            # ? def handle_answer(message):
-            # ?     if message.text == "Yes":
-            # ?         bot.send_message(message.chat.id, "Great! 😊", reply_markup=ReplyKeyboardRemove())
-            # ?     else:
-            # ?         bot.send_message(message.chat.id, "Oh no! 😢", reply_markup=ReplyKeyboardRemove())
+            
 
 
     # * HELPERS

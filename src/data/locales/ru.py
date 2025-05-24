@@ -31,7 +31,7 @@ RU_LOCALE = Locale(
     ],
 
     button_texts = {
-        BOT_BUTTONS.languages: ["Русский", "Украинский"],
+        BOT_BUTTONS.languages: ["Русский", "Українська"],
     },
 
     messages= { 
@@ -80,6 +80,6 @@ RU_LOCALE = Locale(
             f"{NOTION_PAGE.start}",
         ], 
         
-        # BOT_COMMANDS.languages: "Выбери язык / обери мову", 
+        BOT_COMMANDS.languages: "Выбери язык / обери мову", 
     }
 )

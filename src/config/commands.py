@@ -7,7 +7,6 @@ class BotCommands:
     ask: str = "ask"
     prices: str = "prices"
     about: str = "about"
-    # learning_paths: str = "learning_paths"
-    # languages: str = "languages"
+    languages: str = "languages"
     
 BOT_COMMANDS = BotCommands()

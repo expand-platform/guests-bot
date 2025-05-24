@@ -31,10 +31,10 @@ class UserDialogs(BotDialogs):
         button_texts = self.languages.get_button_texts()
         
         #? /start: просит выбрать пункт меню
-        self.dialogGenerator.make_dialog(
-            command_name=BOT_COMMANDS.start,
-            first_message=messages[BOT_COMMANDS.start],
-        )
+        # self.dialogGenerator.make_dialog(
+        #     command_name=BOT_COMMANDS.start,
+        #     first_message=messages[BOT_COMMANDS.start],
+        # )
         
         #? /learn: просит выбрать пункт меню
         self.dialogGenerator.make_dialog(
@@ -60,13 +60,15 @@ class UserDialogs(BotDialogs):
             first_message=messages[BOT_COMMANDS.ask],
         )
 
-        # self.dialogGenerator.make_dialog(
-        #     handler_type=HandlerType.SLASH_COMMAND,
-        #     message_text=messages[BOT_COMMANDS.start],
-        #     inline_button_texts=button_texts[BOT_BUTTONS.languages],
-        #     inline_buttons_callback_property=CallbackProperties.language,
-        #     active_state=None,
-        #     save_to_state=None,
-        # )
+        #? /start - languages
+        self.dialogGenerator.make_dialog(
+            command_name=BOT_COMMANDS.start,
+            first_message=messages[BOT_COMMANDS.languages],
+            # message_text=messages[BOT_COMMANDS.start],
+            # inline_button_texts=button_texts[BOT_BUTTONS.languages],
+            # inline_buttons_callback_property=CallbackProperties.language,
+            # active_state=None,
+            # save_to_state=None,
+        )
 
        
