@@ -14,7 +14,7 @@ class BotDialogs:
     """
     bot: Bot
     dialogGenerator: DialogGenerator
-    language: Languages
+    languages: Languages
 
 
     def create_dialogs(self):

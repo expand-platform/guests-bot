@@ -17,26 +17,25 @@ from libs.bot_engine.enums.User import AccessLevel
 @dataclass
 class Cache:
     SUPER_ADMIN_ID: int
-    _users: list[User] = field(init=False)  
+    _cached_users: list[User] = field(init=False)  
 
     def __post_init__(self):
         #? clean start - no users in cache
-        self._users = []
+        self._cached_users = []
 
             
     def cache_user(self, user: User) -> None:
-        is_user_in_cache = self.check_if_user_exists(user.user_id)
+        """ cache user if it's not in cache already """
+        is_user_in_cache = self.check_if_user_in_cache(user.user_id)
 
-        if is_user_in_cache:
-            return
-        else: 
-            self._users.append(user)
+        if not is_user_in_cache:
+            self._cached_users.append(user)
         
         
     def get_users_from_cache(self) -> list:
-        if len(self._users) > 0:
+        if len(self._cached_users) > 0:
             # print(f"🟢 users in cache: { self.cached_users }")
-            return self._users
+            return self._cached_users
         else:
             # print(f"❌ no users in cache: { self.cached_users }")
             return []
@@ -47,13 +46,15 @@ class Cache:
         return self.admin_ids
     
     
-    def find_active_user(self, user_id: int) -> User | None:
-        # print(f"user_id (Cache.find_active_user): { user_id }")
-        for user in self._users:
+    def find_active_user_in_cache(self, user_id: int) -> User | None:
+        print(f"user_id (Cache.find_active_user): { user_id }")
+        for user in self._cached_users:
             # print(f"user: { user }")
             if user.user_id == user_id:
+                print(f"🟢 User {user_id} found in cache")
                 return user
-        # if user not found
+        # if user is not found
+        print(f"🔴 User {user_id} isn't found in cache")
         return None
     
 
@@ -61,7 +62,7 @@ class Cache:
         """ updates user in cache"""
         print(f"Updating user with id {user_id} in cache..")
 
-        for user in self._users:
+        for user in self._cached_users:
             if user.user_id == user_id:
                 # Handle enum conversion if needed
                 if key == "access_level" and isinstance(new_value, str):
@@ -74,31 +75,31 @@ class Cache:
                 
 
     def get_user(self, user_id: int) -> dict:
-        for user in self._users:
+        for user in self._cached_users:
             if user.user_id == user_id:
                 return user
             
             
     def remove_user(self, user_id: int) -> None:
-        for cache_user in self._users:
+        for cache_user in self._cached_users:
             if user_id == cache_user.user_id:
-                self._users.remove(cache_user)
+                self._cached_users.remove(cache_user)
                 print(f"User removed from cache!")
                 
     
-    def check_if_user_exists(self, user_id: int) -> bool:
-        for user in self._users:
+    def check_if_user_in_cache(self, user_id: int) -> bool:
+        for user in self._cached_users:
             if user.user_id == user_id:
-                print(f"🟡 user exists in Cache: {user_id}")
+                print(f"🟢 user exists in Cache: {user_id}")
                 return True
             else:
-                print(f"🔴 user doesn't exists in Cache: {user_id}")
+                print(f"🟡 user doesn't exists in Cache: {user_id}, caching...")
                 return False
         
 
     
     def find_user_by_property(self, property_name, value):
-        for user in self._users:
+        for user in self._cached_users:
             if property_name in user:
                 if value == user[property_name]:
                     print("🐍 user (find_user_by_property): ",user)
@@ -107,7 +108,7 @@ class Cache:
 
     def clean_users(self):
         """ cleans all users, except super_admin """
-        self._users = []
+        self._cached_users = []
         
         # for user in self.users:
         #     if user.user_id == self.SUPER_ADMIN_ID:
@@ -115,4 +116,4 @@ class Cache:
         #     else:
         #         self.users.remove(user)
         
-        print(f"Кеш пользователей очищен! 🧹\n{self._users}")
+        print(f"Кеш пользователей очищен! 🧹\n{self._cached_users}")

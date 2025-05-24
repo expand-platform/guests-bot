@@ -1,32 +1,3 @@
-#! Этот файл создаётся руками в вашем проекте
-""" 
-    ? Admin commands: 
-    
-    #! Manual DB / users manipulation
-    ? /clean - clean users in DB / cache
-    ? /fill - fill users in DB / cache
-    
-    
-    #! Backups
-    ? /replica - replicates collections
-    ? /load_replica - load given replicated collection
-    
-    
-    #! Scheduled jobs: manual backups
-    ? /new_month - monthly reset
-    
-    
-    #! versions
-    ? /nv - publish new version 
-    
-    
-    #! Users: manual updates
-    ? /su - see user 
-    ? /uu - update user 
-    ? /be - bulk edit user groups 
-"""
-
-
 class AdminDialogs:
     def __init__(self):
         self.log = Logger().info
@@ -38,61 +9,6 @@ class AdminDialogs:
         
     
     def set_admin_dialogs(self):
-        #? /clean
-        self.dialog_generator.simple_admin_command(
-            command_name="clean",
-            database_method_name="clean",
-        )
-
-        #? /fill
-        self.dialog_generator.simple_admin_command(
-            command_name="fill",
-            database_method_name="fill",
-        )
-       
-        #? clear schedule (/cs)
-        self.dialog_generator.simple_admin_command(
-            command_name="cs",
-
-            database_activation_position="before_message",
-            database_method_name="schedule.clear",
-            
-            bot_after_message=self.messages["schedule"]["cleared"],
-        )
-
-        
-        #? /replica
-        self.dialog_generator.simple_admin_command(
-            command_name="replica",
-            
-            database_method_name="replicate_users",
-            database_activation_position="before_message",
-            
-            bot_after_message=self.messages["replica"]["success"],
-        )
-        
-        #? /load_replica
-        self.dialog_generator.simple_admin_command(
-            command_name="load_replica",
-            
-            database_method_name="load_replica",
-            database_activation_position="before_message",
-            
-            bot_after_message=self.messages["replica"]["load_success"],
-        )
-        
-        #? /new_month
-        self.dialog_generator.simple_admin_command(
-            command_name="new_month",
-            
-            database_method_name="monthly_refresh",
-            database_activation_position="after_message",
-            
-            bot_before_message=self.messages["monthly_data_refresh"]["intro"],
-            bot_after_message=self.messages["monthly_data_refresh"]["success"],
-        )
-
-        
         #? /nv 
         #? new_version (step 1) -> prompt for version number 
         self.dialog_generator.make_dialog(

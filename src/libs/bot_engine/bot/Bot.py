@@ -1,7 +1,8 @@
 from __future__ import annotations
-from typing import Union, TYPE_CHECKING
+from typing import Optional, Union, TYPE_CHECKING
 from dataclasses import dataclass, field
 
+from click import Option
 from telebot import TeleBot
 from telebot.types import InlineKeyboardMarkup
 from telebot.states.sync.middleware import StateMiddleware
@@ -16,11 +17,10 @@ from config.env import (
     ADMIN_IDS,
     SUPER_ADMIN_ID,
 )
-
 from libs.bot_engine.languages.Languages import Languages
 
-# if TYPE_CHECKING:
-#     from libs.bot_engine.languages.Languages import Languages
+#? const / enums
+from libs.bot_engine.const.Bot import * 
 
 
 @dataclass
@@ -73,22 +73,25 @@ class Bot:
 
     def tell_admins(self, messages: Union[str, list[str]]):
         for admin_id in ADMIN_IDS:
-            self._send_messages(chat_id=admin_id, messages=messages)
+            self._send_message(chat_id=admin_id, messages=messages)
 
 
-    def tell_super_admin(self, messages: Union[str, list[str]]):
-        self._send_messages(chat_id=SUPER_ADMIN_ID, messages=messages)
+    def tell_super_admin(self, messages: str | list[str]):
+        self._send_message(chat_id=SUPER_ADMIN_ID, messages=messages)
 
 
-    def _send_messages(
+    def _send_message(
         self,
         chat_id: int,
-        messages: Union[str, list[str]],
-        parse_mode="Markdown",
-        format_variables: Union[str, int, list] = [],
-        reply_markup: InlineKeyboardMarkup = None,
-        disable_preview=False,
+        messages: str | list[str],
+
+        format_variables: Optional[str | int | list] = None,
+        reply_markup: Optional[InlineKeyboardMarkup] = None,
+
+        parse_mode=ParseMode.MARKDOWN,
+        disable_preview: Optional[bool] = False,
     ):
+        """ sends one or multiple messages. Supports format variables (1 message = 1 var) """
         if isinstance(messages, str):
             messages = [messages]
 
@@ -96,10 +99,10 @@ class Bot:
             format_variables = [format_variables]
 
         if format_variables:
-            for message, fmt in zip(messages, format_variables):
+            for message, format_variable in zip(messages, format_variables):
                 self._bot.send_message(
                     chat_id=chat_id,
-                    text=message.format(fmt),
+                    text=message.format(format_variable),
                     parse_mode=parse_mode,
                     reply_markup=reply_markup,
                     disable_web_page_preview=disable_preview,

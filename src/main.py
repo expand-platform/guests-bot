@@ -16,7 +16,7 @@ from server.Server import BotServer
 
 # ? languages
 from data.locales.uk import UK_LOCALE
-from data.locales.ru import RU_LOCALE
+from data.locales.ru import RU_LOCALE 
 
 # ? dialogs
 from dialogs.AdminDialogs import AdminDialogs

@@ -18,6 +18,8 @@ class User:
     chat_id: int
 
     access_level: AccessLevel
+
+    language: str 
     joined_at: str
 
     def to_dict(self):
@@ -29,17 +31,19 @@ class User:
 @dataclass
 class NewUser:
     """creates user from it's message data or from database"""
-
     access_level: AccessLevel = AccessLevel.USER
-
 
     def create_user_from_database(self, user) -> User:
         return User(
             first_name=user["first_name"],
             username=user["username"],
+            
             user_id=user["user_id"],
             chat_id=user["chat_id"],
+            
             access_level=self.access_level,
+            
+            language="ru",
             joined_at=datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         )
     
@@ -49,9 +53,13 @@ class NewUser:
         return User(
             first_name=message.from_user.first_name,
             username=message.from_user.username,
+            
             user_id=message.from_user.id,
             chat_id=message.chat.id,
+            
             access_level=self.access_level,
+            
+            language="ru",
             joined_at=datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         )
     

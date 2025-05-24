@@ -2,6 +2,9 @@ from typing import Union, TYPE_CHECKING
 from telebot.custom_filters import AdvancedCustomFilter
 from telebot.types import Message, CallbackQuery
 
+#? bot engine
+from libs.bot_engine.enums.User import *
+
 # ? engine types
 if TYPE_CHECKING:
     from libs.bot_engine.database.Database import Database
@@ -13,27 +16,25 @@ class AccessLevelFilter(AdvancedCustomFilter):
     key = "access_level"
 
     def __init__(self, db: "Database", languages: "Languages"):
-        self.db = db
+        self.database = db
+        self.languages = languages
 
-    def check(self, message: Union[Message, CallbackQuery], access_level: str):
-        print(f"Filters (check)")
 
-        # ? if user replies with a keyboard
+    def check(self, message: Union[Message, CallbackQuery], access_level: list[AccessLevel]):
+        print(f"🔍 Filters (check)")
+        active_user = None
+
+        #? inline keyboard reply filters bot itself
         if not hasattr(message, "chat"):
-            print(f"no message.chat found: { message.message.chat.id }")
+            print(f"reply using inline keyboard from user { message.message.from_user.id }")
+            active_user = self.database.get_active_user(message)
             message = message.message
+        else: 
+            active_user = self.database.get_active_user(message)
 
-        active_user = self.db.get_active_user(message)
         user_access_level = active_user.access_level.value
-        print("🐍 user_access_level: ",user_access_level)
 
-        #! На этом этапе можно пробовать задавать активный язык юзера
-        #? Languages.set_active_lang from active_user.language
+        self.languages.set_active_language(active_user.language)
 
-        #? check a list of values or a single value
-        if isinstance(access_level, list):
-            print("if", user_access_level in access_level)
-            return user_access_level in access_level
-        else:
-            print("else", user_access_level == access_level)
-            return user_access_level == access_level
+        access_level_values = [level.value for level in access_level]
+        return user_access_level in access_level_values 

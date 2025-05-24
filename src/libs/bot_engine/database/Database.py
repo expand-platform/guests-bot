@@ -4,7 +4,6 @@ from typing import List, Optional, Any
 from telebot.types import Message
 
 # ? bot engine
-# from config.env import ENVIRONMENT, BOT_TOKEN, ADMIN_IDS, SUPER_ADMIN_ID
 from config.env import ADMIN_IDS, SUPER_ADMIN_ID
 from libs.bot_engine.users.User import User, UserProfile, NewUser
 from libs.bot_engine.database.MongoDB import MongoDB
@@ -67,7 +66,7 @@ class Database:
 
 
     def get_users(self):
-        return self._cache._users
+        return self._cache._cached_users
 
 
     def add_user(self, new_user: User):
@@ -91,11 +90,14 @@ class Database:
         elif user_id in ADMIN_IDS or user_id == ADMIN_IDS:
             return AccessLevel.ADMIN
         
-        elif user_id in USER_IDS or user_id == USER_IDS: 
-            return AccessLevel.USER
+        if self.USER_IDS:
+            if user_id in self.USER_IDS or user_id == self.USER_IDS: 
+                return AccessLevel.USER
+            else:
+                return AccessLevel.GUEST
         
         else:
-            return AccessLevel.GUEST
+            return AccessLevel.USER
 
 
     def create_user_from_message(self, message: Message) -> User:
@@ -114,28 +116,23 @@ class Database:
 
     def get_active_user(self, message: Message) -> User:
         """get saved active user or create a new user"""
-        active_user = self._cache.find_active_user(user_id=message.chat.id)
-
-        # ? update telegram profile and cache user
-        if active_user:
-            self.update_user_profile(active_user, message)
-            print(f"👌 User is in cache: { active_user }")
-
+        active_user = self._cache.find_active_user_in_cache(user_id=message.from_user.id)
+        
         # ? if no user, create it from message
-        else:
+        if active_user is None:
             print(f"👀 Wow, there's someone new here..")
             active_user = self.create_user_from_message(message)
             self._database.add_user(active_user)
+            self.cache_user(active_user)
 
-        self.cache_user(active_user)
         return active_user
-
+    
 
     # ? cache methods
     def cache_user(self, user: User):
         """cache user in Cache"""
         self._cache.cache_user(user)
-        print(f"🤿 user {user.first_name} cached!")
+        print(f"🤿 User {user.first_name} cached!")
 
 
     #! Автоматически детектить админов и суперадминов по их user_id
@@ -159,7 +156,7 @@ class Database:
                 new_user = self.create_user_from_database(user)
                 self._cache.cache_user(new_user)
 
-            print(f"👥 Users in cache: { len(self._cache._users) }")
+            print(f"👥 Users in cache: { len(self._cache._cached_users) }")
 
         # ? else, cache.users == []
         else:
@@ -178,8 +175,9 @@ class Database:
         self.update_user(user_id=user_id, key="real_name", new_value=new_value)
 
 
+    #! Нужно делать апдейт не чаще, чем раз в сутки. А то и раз в неделю.       
     def update_user_profile(self, active_user: User, message: Message):
-        """ updates user data from telegram """
+        """ updates user profile from telegram message """
         profile = UserProfile(message)
 
         first_name = profile.get_first_name()

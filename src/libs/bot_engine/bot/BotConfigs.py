@@ -47,8 +47,7 @@ class BotPlugins:
         for locale in locales:
             self.languages.add_locale(locale)
 
-        self.languages.active_lang = bot_language
-        self.languages.set_messages(bot_language)
+        self.languages.set_active_language(bot_language)
         print(f"🌐 {bot_language } language set!")
 
 

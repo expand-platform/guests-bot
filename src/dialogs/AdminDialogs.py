@@ -11,14 +11,14 @@ class AdminDialogs(BotDialogs):
             Example: 
             self.DialogGenerator.make_dialog(...) (see templates)
         """
-        messages = self.language.get_messages()
+        messages = self.languages.get_messages()
 
-        self.dialogGenerator.make_dialog(
-            access_level=["admin", "super_admin"],
-            handler_type="command",
-            command_name="start",
+        # self.dialogGenerator.make_dialog(
+        #     access_level=["admin", "super_admin"],
+        #     respond_to="command",
+        #     slash_command_name="start",
             
-            # formatted_variables=[]
-            bot_before_message=messages["start"],
-        )
+        #     # formatted_variables=[]
+        #     before_message=messages["start"],
+        # )
         
