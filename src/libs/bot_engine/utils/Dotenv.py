@@ -1,13 +1,13 @@
-from dotenv import dotenv_values
-from typing import Union
+from dotenv import load_dotenv
+from os import getenv
 
 
 class Dotenv:
     def __init__(self):
-        self.config = dotenv_values(".env")
+        load_dotenv()
 
     def get(self, key_name: str) -> str | None:
-        value = self.config.get(key_name)
+        value = getenv(key=key_name)
         if value is None:
             print(f"🔴 CRITICAL: you must set the key '{key_name}' in your .env file!")
         return value
