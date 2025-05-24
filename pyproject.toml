@@ -1,34 +1,29 @@
-[project]
+[tool.poetry]
 name = "guests-bot"
 version = "0.1.0"
 description = ""
-authors = [
-    {name = "Ca-tt",email = "damir96.lukyanenko@gmail.com"}
-]
+authors = ["Ca-tt <damir96.lukyanenko@gmail.com>"]
 readme = "README.md"
-requires-python = ">=3.13"
-dependencies = [
-    "beautifulsoup4 (>=4.13.3,<5.0.0)",
-    "python-dotenv (>=1.0.1,<2.0.0)",
-    "requests (>=2.32.3,<3.0.0)",
-    "fastapi (>=0.115.11,<0.116.0)",
-    "httpx (>=0.28.1,<0.29.0)",
-    "uvicorn (>=0.34.0,<0.35.0)",
-    "apscheduler (>=3.11.0,<4.0.0)",
-    "keyboard (>=0.13.5,<0.14.0)",
-    "psutil (>=7.0.0,<8.0.0)",
-    "pymongo (>=4.12.0,<5.0.0)",
-    "pytelegrambotapi (>=4.26.0,<5.0.0)",
-    "watchdog (>=6.0.0,<7.0.0)",
-    "certifi (>=2025.1.31,<2026.0.0)",
-    "urllib3 (>=2.4.0,<3.0.0)",
-]
+packages = []  
+python = ">=3.13"
 
-
-[tool.poetry]
-package-mode = false
-
+[tool.poetry.dependencies]
+python = ">=3.13"
+beautifulsoup4 = ">=4.13.3,<5.0.0"
+python-dotenv = ">=1.0.1,<2.0.0"
+requests = ">=2.32.3,<3.0.0"
+fastapi = ">=0.115.11,<0.116.0"
+httpx = ">=0.28.1,<0.29.0"
+uvicorn = ">=0.34.0,<0.35.0"
+apscheduler = ">=3.11.0,<4.0.0"
+keyboard = ">=0.13.5,<0.14.0"
+psutil = ">=7.0.0,<8.0.0"
+pymongo = ">=4.12.0,<5.0.0"
+pytelegrambotapi = ">=4.26.0,<5.0.0"
+watchdog = ">=6.0.0,<7.0.0"
+certifi = ">=2025.1.31,<2026.0.0"
+urllib3 = ">=2.4.0,<3.0.0"
 
 [build-system]
-requires = ["poetry-core>=2.0.0,<3.0.0"]
+requires = ["poetry-core>=1.5.0"]  # Adjust if needed
 build-backend = "poetry.core.masonry.api"
