@@ -34,7 +34,6 @@ class Languages:
     def set_active_language(self, new_language_name: str):
         """ sets a new active language used for retrieving texts """
         self.active_lang = new_language_name
-        # print(f"active language now is: {self.active_lang}")
 
 
     def get_messages(self, user_language: Optional[str] = None) -> dict[str, str]:
@@ -46,7 +45,6 @@ class Languages:
     def get_button_texts(self, user_language: Optional[str] = None) -> dict[str, list[str]]:
         """ get button texts """
         active_language = user_language or self.active_lang
-        # print(f"button texts: {self.button_texts[active_language]}")
         return self.button_texts[active_language]
     
     def get_menu_commands(self, user_language: Optional[str] = None) -> list[BotCommand]:

@@ -1,6 +1,6 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from sre_parse import State
-from typing import Callable, Optional, Union
+from typing import Any, Callable, Optional, Union
 from random import choices
 from string import ascii_lowercase
 
@@ -36,6 +36,15 @@ class DialogGenerator:
     bot: Bot
     languages: Languages
     database: Database
+
+    #? API
+    api_clients: dict[str, Any] = field(default_factory=dict, init=False)
+
+
+    def add_api_client(self, client_name: str, client: Any):
+        """ set API to work with """
+        self.api_clients[client_name] = client
+
 
     def set_handler_type(self, 
         state: StateContext | None = None, 

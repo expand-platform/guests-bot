@@ -1,6 +1,6 @@
 from os import getenv
 from dataclasses import dataclass, field
-from typing import Callable, List, Optional
+from typing import Any, Callable, List, Optional
 
 #? engine
 from libs.bot_engine.languages.Locale import Locale
@@ -32,7 +32,6 @@ class BotPlugins:
     db: Database
     bot: Bot
     dialogGenerator: DialogGenerator
-    # BotDialogs: BotDialogs
 
     
     def set_database(self):
@@ -40,6 +39,13 @@ class BotPlugins:
         #? Prepare users in cache for further interactions  
         self.db.cache_users()
         pass
+    
+
+    #! Create list of constants of supported API clients
+    def add_api_client(self, client_name: str, client: Any):
+        """ sets global access to API client for all bot components """
+        self.dialogGenerator.add_api_client(client_name=client_name,client=client)
+        print(f"🟢 API client {client_name} set!")
 
 
     def set_languages(self, locales: list[Locale], bot_language = "ru"):
@@ -56,7 +62,7 @@ class BotPlugins:
         menu_commands = self.languages.get_menu_commands()
         
         self.bot._bot.set_my_commands([])
-        self.bot._bot.set_my_commands(menu_commands)
+        self.bot._bot.set_my_commands(commands=menu_commands)
         print("🔉 Slash commands set!")
 
 

@@ -1,6 +1,6 @@
-DATABASE_NAME = "guests-bot"
+DATABASE_NAME = "trading-bot"
 DATABASE_CONNECTIONS_LIMIT=1
 
 USER_COLLECTION = "users"
 
-REPLICA_NAME="guests-bot-replica"
+REPLICA_NAME="trading-bot-replica"

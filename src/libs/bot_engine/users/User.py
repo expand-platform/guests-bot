@@ -1,12 +1,15 @@
 from dataclasses import dataclass, asdict
 from typing import Optional, Any
-
 from telebot.types import Message
 from datetime import datetime
+
+#? configs
+from config.langConfig import DEFAULT_LANGUAGE
 
 # ? engine
 from libs.bot_engine.languages.Languages import Languages
 from libs.bot_engine.enums.User import AccessLevel, CreateMethod
+
 
 
 @dataclass
@@ -43,7 +46,7 @@ class NewUser:
             
             access_level=self.access_level,
             
-            language="ru",
+            language=DEFAULT_LANGUAGE,
             joined_at=datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         )
     
@@ -59,7 +62,7 @@ class NewUser:
             
             access_level=self.access_level,
             
-            language="ru",
+            language=DEFAULT_LANGUAGE,
             joined_at=datetime.now().strftime("%d-%m-%Y %H:%M:%S"),
         )
     

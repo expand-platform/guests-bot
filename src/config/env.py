@@ -11,3 +11,7 @@ DATABASE_TOKEN: str = dotenv.get("DATABASE_TOKEN") or ""
 
 SUPER_ADMIN_ID: int = dotenv.get_int("SUPER_ADMIN_ID")
 ADMIN_IDS: list[int] = dotenv.get_list_of_ints("ADMIN_IDS")
+
+#? bot-specific settings
+BINANCE_TOKEN: str = dotenv.get("BINANCE_API_KEY") or "" 
+BINANCE_SECRET: str = dotenv.get("BINANCE_SECRET_KEY") or "" 

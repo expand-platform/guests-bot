@@ -1,12 +1,11 @@
-from dataclasses import dataclass
+from dataclasses import dataclass, field
+from typing import Optional
+
+
 
 @dataclass
 class BotCommands:
     start: str = "start"
-    learn: str = "learn"
-    ask: str = "ask"
-    prices: str = "prices"
-    about: str = "about"
-    languages: str = "languages"
-    
+    btc_price: str = "btc_price"
+
 BOT_COMMANDS = BotCommands()

@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "guests-bot"
+name = "trading-bot"
 version = "0.1.0"
 description = ""
 authors = ["Ca-tt <damir96.lukyanenko@gmail.com>"]
@@ -22,7 +22,8 @@ pytelegrambotapi = ">=4.26.0,<5.0.0"
 watchdog = ">=6.0.0,<7.0.0"
 certifi = ">=2025.1.31,<2026.0.0"
 urllib3 = ">=2.4.0,<3.0.0"
+python-binance = "^1.0.29"
 
 [build-system]
-requires = ["poetry-core>=1.5.0"]  # Adjust if needed
+requires = ["poetry-core>=1.5.0"] 
 build-backend = "poetry.core.masonry.api"
